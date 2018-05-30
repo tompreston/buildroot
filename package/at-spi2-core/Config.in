@@ -1,0 +1,9 @@
+config BR2_PACKAGE_AT_SPI2_CORE
+	bool "at-spi2-core"
+	select BR2_PACKAGE_DBUS
+	select BR2_PACKAGE_XLIB_LIBXTST
+	help
+	  The At-Spi2 Core package is a part of the GNOME Accessibility Project.
+	  It provides a Service Provider Interface for the Assistive Technologies
+	  available on the GNOME platform and a library against which 
+	  applications can be linked.
