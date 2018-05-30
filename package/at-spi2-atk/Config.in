@@ -1,0 +1,5 @@
+config BR2_PACKAGE_AT_SPI2_ATK
+	bool "at-spi2-atk"
+	select BR2_PACKAGE_AT_SPI2_CORE
+	help
+	  The At-Spi2 Atk package contains a library that bridges ATK to At-Spi2 D-Bus service.
