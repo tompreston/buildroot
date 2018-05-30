@@ -943,6 +943,7 @@ F:	configs/qemu_ppc64le_pseries_defconfig
 N:	Joseph Kogut <joseph.kogut@gmail.com>
 F:	package/at-spi2-atk/
 F:	package/at-spi2-core/
+F:	package/chromium/
 F:	package/gconf/
 F:	package/libnss/
 F:	package/python-cython/

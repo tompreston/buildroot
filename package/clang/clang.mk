@@ -86,8 +86,8 @@ endef
 HOST_CLANG_POST_INSTALL_HOOKS = HOST_CLANG_INSTALL_CLANG_TBLGEN
 
 # This option must be enabled to link libclang dynamically against libLLVM.so
-HOST_CLANG_CONF_OPTS += -DLLVM_LINK_LLVM_DYLIB=ON
-CLANG_CONF_OPTS += -DLLVM_LINK_LLVM_DYLIB=ON
+HOST_CLANG_CONF_OPTS += -DLLVM_LINK_LLVM_DYLIB=OFF
+CLANG_CONF_OPTS += -DLLVM_LINK_LLVM_DYLIB=OFF
 
 $(eval $(cmake-package))
 $(eval $(host-cmake-package))
