@@ -1,0 +1,28 @@
+From aed4599c18586dfac46139a3c32011f804fdaef6 Mon Sep 17 00:00:00 2001
+From: Joseph Kogut <joseph.kogut@gmail.com>
+Date: Wed, 13 Jun 2018 13:59:24 -0700
+Subject: [PATCH] Fix arm build with glibc 2.27
+
+Upstream patch from: https://chromium-review.googlesource.com/c/crashpad/crashpad/+/1060155
+
+Signed-off-by: Joseph Kogut <joseph.kogut@gmail.com>
+---
+ third_party/crashpad/crashpad/compat/linux/sys/ptrace.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h b/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
+index 73861576d..e5c95c7cc 100644
+--- a/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
++++ b/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
+@@ -34,7 +34,7 @@ static constexpr __ptrace_request PTRACE_GET_THREAD_AREA =
+ #endif  // !PTRACE_GET_THREAD_AREA && !PT_GET_THREAD_AREA && defined(__GLIBC__)
+ 
+ // https://sourceware.org/bugzilla/show_bug.cgi?id=22433
+-#if !defined(PTRACE_GETVFPREGS) && \
++#if !defined(PTRACE_GETVFPREGS) && !defined(PT_GETVFPREGS) && \
+     defined(__GLIBC__) && (defined(__arm__) || defined(__arm64__))
+ static constexpr __ptrace_request PTRACE_GETVFPREGS =
+     static_cast<__ptrace_request>(27);
+-- 
+2.17.1
+
