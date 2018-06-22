@@ -31,6 +31,10 @@ LIBGTK3_DEPENDENCIES = host-pkgconf host-libgtk3 atk libglib2 cairo pango gdk-pi
 ifeq ($(BR2_PACKAGE_LIBGTK3_X11),y)
 LIBGTK3_DEPENDENCIES += fontconfig xlib_libX11 xlib_libXext xlib_libXrender xlib_libXi
 
+ifeq ($(BR2_PACKAGE_AT_SPI2_ATK),y)
+LIBGTK3_DEPENDENCIES += at-spi2-atk
+endif
+
 LIBGTK3_CONF_OPTS += \
 	--enable-x11-backend \
 	--x-includes=$(STAGING_DIR)/usr/include/X11 \
