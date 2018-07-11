@@ -41,6 +41,10 @@ CHROMIUM_OPTS = \
 # tcmalloc has portability issues
 CHROMIUM_OPTS += use_allocator=\"none\"
 
+ifeq ($(BR2_CCACHE),y)
+CHROMIUM_CC_WRAPPER = ccache
+endif
+
 # V8 snapshots require compiling V8 with the same word size as the target
 # architecture, which means the host needs to have that toolchain available.
 CHROMIUM_OPTS += v8_use_snapshot=false
@@ -115,8 +119,8 @@ define CHROMIUM_CONFIGURE_CMDS
 		PKG_CONFIG_PATH="$(STAGING_DIR)/usr/lib/pkgconfig" \
 		TARGET_AR="ar" \
 		TARGET_NM="nm" \
-		TARGET_CC="clang" \
-		TARGET_CXX="clang++" \
+		TARGET_CC="$(CHROMIUM_CC_WRAPPER) clang" \
+		TARGET_CXX="$(CHROMIUM_CC_WRAPPER) clang++" \
 		TARGET_CFLAGS="$(CHROMIUM_TARGET_CFLAGS)" \
 		TARGET_CXXFLAGS="$(CHROMIUM_TARGET_CXXFLAGS)" \
 		TARGET_LDFLAGS="$(CHROMIUM_TARGET_LDFLAGS)" \
