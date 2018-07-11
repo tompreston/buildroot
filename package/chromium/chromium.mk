@@ -112,6 +112,7 @@ define CHROMIUM_CONFIGURE_CMDS
 		HOST_CXX="$(HOSTCXX)" \
 		HOST_CFLAGS="$(HOST_CFLAGS)" \
 		HOST_CXXFLAGS="$(HOST_CXXFLAGS)" \
+		PKG_CONFIG_PATH="$(STAGING_DIR)/usr/lib/pkgconfig" \
 		TARGET_AR="ar" \
 		TARGET_NM="nm" \
 		TARGET_CC="clang" \
