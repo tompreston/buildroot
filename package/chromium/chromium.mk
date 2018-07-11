@@ -35,7 +35,8 @@ CHROMIUM_OPTS = \
 	use_system_libpng=true \
 	use_system_libdrm=true \
 	use_system_harfbuzz=true \
-	use_system_freetype=true
+	use_system_freetype=true \
+	pkg_config=\"$(HOST_PKG_CONFIG_PATH)\"
 
 # tcmalloc has portability issues
 CHROMIUM_OPTS += use_allocator=\"none\"
@@ -115,7 +116,6 @@ define CHROMIUM_CONFIGURE_CMDS
 		HOST_CXX="$(HOSTCXX)" \
 		HOST_CFLAGS="$(HOST_CFLAGS)" \
 		HOST_CXXFLAGS="$(HOST_CXXFLAGS)" \
-		PKG_CONFIG_PATH="$(STAGING_DIR)/usr/lib/pkgconfig" \
 		TARGET_AR="ar" \
 		TARGET_NM="nm" \
 		TARGET_CC="$(CHROMIUM_CC_WRAPPER) clang" \
