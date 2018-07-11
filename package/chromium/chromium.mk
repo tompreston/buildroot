@@ -9,7 +9,7 @@ CHROMIUM_SITE = https://commondatastorage.googleapis.com/chromium-browser-offici
 CHROMIUM_SOURCE = chromium-$(CHROMIUM_VERSION).tar.xz
 CHROMIUM_LICENSE = BSD-Style
 CHROMIUM_LICENSE_FILES = LICENSE
-CHROMIUM_DEPENDENCIES = alsa-lib cairo cups dbus freetype harfbuzz \
+CHROMIUM_DEPENDENCIES = alsa-lib cairo cups freetype harfbuzz \
 			host-clang host-lld host-ninja host-nodejs host-python \
 			jpeg-turbo libdrm libglib2 libkrb5 libnss libpng pango \
 			xlib_libXcomposite xlib_libXScrnSaver xlib_libXcursor \
@@ -30,7 +30,6 @@ CHROMIUM_OPTS = \
 	target_sysroot=\"$(STAGING_DIR)\" \
 	target_cpu=\"$(BR2_PACKAGE_CHROMIUM_TARGET_ARCH)\" \
 	enable_nacl=false \
-	use_dbus=true \
 	use_system_zlib=true \
 	use_system_libjpeg=true \
 	use_system_libpng=true \
