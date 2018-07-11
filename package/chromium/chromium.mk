@@ -108,6 +108,10 @@ define CHROMIUM_CONFIGURE_CMDS
 	mkdir -p $(@D)/third_party/node/linux/node-linux-x64/bin
 	ln -sf $(HOST_DIR)/bin/node $(@D)/third_party/node/linux/node-linux-x64/bin/
 
+	# Use python2 by default
+	mkdir -p $(@D)/bin
+	ln -sf $(HOST_DIR)/usr/bin/python2 $(@D)/bin/python
+
 	( cd $(@D); \
 		$(TARGET_MAKE_ENV) \
 		$(HOST_DIR)/bin/python2 tools/gn/bootstrap/bootstrap.py -s --no-clean; \
@@ -132,6 +136,7 @@ endef
 define CHROMIUM_BUILD_CMDS
 	( cd $(@D); \
 		$(TARGET_MAKE_ENV) \
+		PATH=$(@D)/bin:$(BR_PATH) \
 		ninja -j$(PARALLEL_JOBS) -C out/Release chrome chrome_sandbox chromedriver \
 	)
 endef
