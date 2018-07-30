@@ -29,6 +29,7 @@ CHROMIUM_OPTS = \
 	target_sysroot=\"$(STAGING_DIR)\" \
 	target_cpu=\"$(BR2_PACKAGE_CHROMIUM_TARGET_ARCH)\" \
 	enable_nacl=false \
+	enable_linux_installer=false \
 	use_system_zlib=true \
 	use_system_libjpeg=true \
 	use_system_libpng=true \
