@@ -57,8 +57,11 @@ config BR2_PACKAGE_CHROMIUM_PROPRIETARY_CODECS
 endif # BR2_PACKAGE_CHROMIUM
 
 comment "chromium needs toolchain w/ Glibc, host gcc >= 4.9.0, dynamic library"
-	depends on !BR2_TOOLCHAIN_USES_GLIBC \
+	depends on BR2_PACKAGE_CHROMIUM_ARCH_SUPPORTS \
+		&& !BR2_TOOLCHAIN_USES_GLIBC \
 		|| !BR2_HOST_GCC_AT_LEAST_4_9
 
 comment "chromium needs X.org and an OpenGL backend"
-	depends on !BR2_PACKAGE_XORG7 || !BR2_PACKAGE_HAS_LIBGL
+	depends on BR2_PACKAGE_CHROMIUM_ARCH_SUPPORTS \
+		&& !BR2_PACKAGE_XORG7 \
+		|| !BR2_PACKAGE_HAS_LIBGL
