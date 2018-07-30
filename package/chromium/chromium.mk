@@ -10,7 +10,7 @@ CHROMIUM_SOURCE = chromium-$(CHROMIUM_VERSION).tar.xz
 CHROMIUM_LICENSE = BSD-Style
 CHROMIUM_LICENSE_FILES = LICENSE
 CHROMIUM_DEPENDENCIES = alsa-lib cairo cups freetype harfbuzz \
-			host-clang host-lld host-ninja host-nodejs host-python \
+			host-clang host-ninja host-nodejs host-python \
 			jpeg-turbo libdrm libglib2 libkrb5 libnss libpng pango \
 			xlib_libXcomposite xlib_libXScrnSaver xlib_libXcursor \
 			xlib_libXrandr zlib
@@ -20,7 +20,6 @@ CHROMIUM_TOOLCHAIN_CONFIG_PATH = $(shell pwd)/package/chromium/toolchain
 CHROMIUM_OPTS = \
 	host_toolchain=\"$(CHROMIUM_TOOLCHAIN_CONFIG_PATH):host\" \
 	custom_toolchain=\"$(CHROMIUM_TOOLCHAIN_CONFIG_PATH):target\" \
-	use_lld=true \
 	is_clang=true \
 	clang_use_chrome_plugins=false \
 	treat_warnings_as_errors=false \
@@ -44,6 +43,14 @@ CHROMIUM_OPTS += use_allocator=\"none\"
 
 ifeq ($(BR2_CCACHE),y)
 CHROMIUM_CC_WRAPPER = ccache
+endif
+
+# LLD is unsupported on i386, and fails during linking
+ifeq ($(BR2_i386)$(BR2_mips)$(BR2_mipsel)$(BR2_mips64)$(BR2_mips64el),y)
+CHROMIUM_OPTS += use_lld=false
+else
+CHROMIUM_DEPENDENCIES += host-lld
+CHROMIUM_OPTS += use_lld=true
 endif
 
 # V8 snapshots require compiling V8 with the same word size as the target
