@@ -115,6 +115,9 @@ define CHROMIUM_CONFIGURE_CMDS
 
 	( cd $(@D); \
 		$(TARGET_MAKE_ENV) \
+		AR="$(HOSTAR)" \
+		CC="$(HOSTCC)" \
+		CXX="$(HOSTCXX)" \
 		$(HOST_DIR)/bin/python2 tools/gn/bootstrap/bootstrap.py -s --no-clean; \
 		HOST_AR="$(HOSTAR)" \
 		HOST_NM="$(HOSTNM)" \
