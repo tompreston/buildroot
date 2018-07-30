@@ -75,12 +75,6 @@ ifeq ($(BR2_PACKAGE_CHROMIUM_PROPRIETARY_CODECS),y)
 CHROMIUM_OPTS += proprietary_codecs=true ffmpeg_branding=\"Chrome\"
 endif
 
-ifeq ($(BR2_PACKAGE_DBUS),y)
-CHROMIUM_OPTS += use_dbus=true
-else
-CHROMIUM_OPTS += use_dbus=false
-endif
-
 ifeq ($(BR2_PACKAGE_PCIUTILS),y)
 CHROMIUM_DEPENDENCIES += pciutils
 CHROMIUM_OPTS += use_libpci=true
