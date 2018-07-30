@@ -36,7 +36,6 @@ CHROMIUM_OPTS = \
 	use_system_libdrm=true \
 	use_system_harfbuzz=true \
 	use_system_freetype=true \
-	pkg_config=\"$(HOST_PKG_CONFIG_PATH)\" \
 	is_official_build=true
 
 # tcmalloc has portability issues
