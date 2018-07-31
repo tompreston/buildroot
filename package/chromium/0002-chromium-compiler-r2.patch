@@ -3,12 +3,11 @@ From: Mike Gilbert <floppym@gentoo.org>
 Date: Wed, 25 Apr 2018 13:22:49 -0400
 Subject: [PATCH] Disable various compiler configs
 
-Fetch from: https://gitweb.gentoo.org/repo/gentoo.git/tree/www-client/chromium
-
 Removes warning about unsupported compiler options.
 
-Signed-off-by: Joseph Kogut <joseph.kogut@gmail.com>
+Fetch from: https://gitweb.gentoo.org/repo/gentoo.git/tree/www-client/chromium
 
+Signed-off-by: Joseph Kogut <joseph.kogut@gmail.com>
 ---
  build/config/compiler/BUILD.gn | 61 ++++++++++------------------------
  1 file changed, 18 insertions(+), 43 deletions(-)

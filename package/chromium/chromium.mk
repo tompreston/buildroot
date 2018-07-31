@@ -9,9 +9,10 @@ CHROMIUM_SITE = https://commondatastorage.googleapis.com/chromium-browser-offici
 CHROMIUM_SOURCE = chromium-$(CHROMIUM_VERSION).tar.xz
 CHROMIUM_LICENSE = BSD-Style
 CHROMIUM_LICENSE_FILES = LICENSE
-CHROMIUM_DEPENDENCIES = alsa-lib cairo cups freetype harfbuzz \
-			host-clang host-ninja host-nodejs host-python \
-			jpeg-turbo libdrm libglib2 libkrb5 libnss libpng pango \
+CHROMIUM_DEPENDENCIES = alsa-lib cairo ffmpeg flac fontconfig freetype \
+			harfbuzz host-clang host-ninja host-nodejs host-python \
+			icu jpeg libdrm libglib2 libkrb5 libnss libpng \
+			libxml2 libxslt minizip opus pango snappy webp \
 			xlib_libXcomposite xlib_libXScrnSaver xlib_libXcursor \
 			xlib_libXrandr zlib
 
@@ -29,14 +30,35 @@ CHROMIUM_OPTS = \
 	target_sysroot=\"$(STAGING_DIR)\" \
 	target_cpu=\"$(BR2_PACKAGE_CHROMIUM_TARGET_ARCH)\" \
 	enable_nacl=false \
+	enable_swiftshader=false \
 	enable_linux_installer=false \
 	use_system_zlib=true \
 	use_system_libjpeg=true \
 	use_system_libpng=true \
-	use_system_libdrm=true \
 	use_system_harfbuzz=true \
 	use_system_freetype=true \
-	is_official_build=true
+	use_custom_libcxx=false
+
+CHROMIUM_SYSTEM_LIBS = \
+	ffmpeg \
+	flac \
+	fontconfig \
+	freetype \
+	harfbuzz-ng \
+	icu \
+	libdrm \
+	libjpeg \
+	libwebp \
+	libxml \
+	libxslt \
+	opus \
+	snappy \
+	zlib
+
+ifeq ($(BR2_i386)$(BR2_x86_64),y)
+CHROMIUM_SYSTEM_LIBS += yasm
+CHROMIUM_DEPENDENCIES += host-yasm
+endif
 
 # tcmalloc has portability issues
 CHROMIUM_OPTS += use_allocator=\"none\"
@@ -106,12 +128,35 @@ CHROMIUM_TARGET_CFLAGS += $(CHROMIUM_TARGET_LDFLAGS)
 CHROMIUM_TARGET_CXXFLAGS += $(CHROMIUM_TARGET_CFLAGS)
 
 define CHROMIUM_CONFIGURE_CMDS
+	# Allow building against system libraries in official builds
+	( cd $(@D); \
+		sed -i 's/OFFICIAL_BUILD/GOOGLE_CHROME_BUILD/' \
+			tools/generate_shim_headers/generate_shim_headers.py \
+	)
+
 	mkdir -p $(@D)/third_party/node/linux/node-linux-x64/bin
 	ln -sf $(HOST_DIR)/bin/node $(@D)/third_party/node/linux/node-linux-x64/bin/
 
 	# Use python2 by default
 	mkdir -p $(@D)/bin
 	ln -sf $(HOST_DIR)/usr/bin/python2 $(@D)/bin/python
+
+	( cd $(@D); \
+		for _lib in $(CHROMIUM_SYSTEM_LIBS); do \
+			find "third_party/$$_lib" -type f \
+			  \! -path "third_party/$$_lib/chromium/*" \
+			  \! -path "third_party/$$_lib/google/*" \
+			  \! -path "third_party/yasm/run_yasm.py" \
+			  \! -regex '.*\.\(gn\|gni\|isolate\)' \
+			  -delete; \
+		done \
+	)
+
+	( cd $(@D); \
+		$(TARGET_MAKE_ENV) \
+		build/linux/unbundle/replace_gn_files.py \
+			--system-libraries $(CHROMIUM_SYSTEM_LIBS) \
+	)
 
 	( cd $(@D); \
 		$(TARGET_MAKE_ENV) \
@@ -154,7 +199,6 @@ define CHROMIUM_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/lib/chromium/
 	$(INSTALL) -Dm644 -t $(TARGET_DIR)/usr/lib/chromium/locales \
 		$(@D)/out/Release/locales/*.pak
-	cp $(@D)/out/Release/icudtl.dat $(TARGET_DIR)/usr/lib/chromium/
 endef
 
 $(eval $(generic-package))
