@@ -70,6 +70,8 @@ endif
 # LLD is unsupported on i386, and fails during linking
 ifeq ($(BR2_i386)$(BR2_mips)$(BR2_mipsel)$(BR2_mips64)$(BR2_mips64el),y)
 CHROMIUM_OPTS += use_lld=false
+# Disable gold as well, to force usage of our toolchain's ld.bfd
+CHROMIUM_OPTS += use_gold=false
 else
 CHROMIUM_DEPENDENCIES += host-lld
 CHROMIUM_OPTS += use_lld=true
