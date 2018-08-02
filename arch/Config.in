@@ -229,6 +229,12 @@ config BR2_sparc64
 	  http://www.oracle.com/sun
 	  http://en.wikipedia.org/wiki/Sparc
 
+config BR2_web
+	bool "Web"
+	select BR2_ARCH_HAS_NO_TOOLCHAIN_BUILDROOT
+	help
+	  Compile to web
+
 config BR2_x86_64
 	bool "x86_64"
 	select BR2_ARCH_IS_64
@@ -341,6 +347,7 @@ config BR2_READELF_ARCH_NAME
 choice
 	prompt "Target Binary Format"
 	default BR2_BINFMT_ELF if BR2_USE_MMU
+	default BR2_BINFMT_WEBASM if BR2_web
 	default BR2_BINFMT_FLAT
 
 config BR2_BINFMT_ELF
@@ -355,10 +362,23 @@ config BR2_BINFMT_ELF
 config BR2_BINFMT_FLAT
 	bool "FLAT"
 	depends on !BR2_USE_MMU
+	depends on !BR2_web
 	help
 	  FLAT binary is a relatively simple and lightweight executable
 	  format based on the original a.out format. It is widely used
 	  in environment where no MMU is available.
+
+config BR2_BINFMT_WEBASM
+	bool "WebAssembly"
+	depends on BR2_web
+	help
+	  WebAssembly
+
+config BR2_BINFMT_ASMJS
+	bool "asm.js"
+	depends on BR2_web
+	help
+	  asm.js
 
 endchoice
 
@@ -429,6 +449,10 @@ endif
 
 if BR2_sparc || BR2_sparc64
 source "arch/Config.in.sparc"
+endif
+
+if BR2_web
+source "arch/Config.in.web"
 endif
 
 if BR2_i386 || BR2_x86_64
