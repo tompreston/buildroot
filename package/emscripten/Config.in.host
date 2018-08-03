@@ -1,0 +1,6 @@
+config BR2_PACKAGE_HOST_EMSCRIPTEN
+	bool "host emscripten"
+	select BR2_PACKAGE_HOST_LLVM
+	select BR2_PACKAGE_HOST_CLANG
+	help
+	  Emscripten
