@@ -21,6 +21,7 @@ CHROMIUM_TOOLCHAIN_CONFIG_PATH = $(shell pwd)/package/chromium/toolchain
 CHROMIUM_OPTS = \
 	host_toolchain=\"$(CHROMIUM_TOOLCHAIN_CONFIG_PATH):host\" \
 	custom_toolchain=\"$(CHROMIUM_TOOLCHAIN_CONFIG_PATH):target\" \
+	v8_snapshot_toolchain=\"$(CHROMIUM_TOOLCHAIN_CONFIG_PATH):v8_snapshot\" \
 	is_clang=true \
 	clang_use_chrome_plugins=false \
 	treat_warnings_as_errors=false \
@@ -76,10 +77,6 @@ else
 CHROMIUM_DEPENDENCIES += host-lld
 CHROMIUM_OPTS += use_lld=true
 endif
-
-# V8 snapshots require compiling V8 with the same word size as the target
-# architecture, which means the host needs to have that toolchain available.
-CHROMIUM_OPTS += v8_use_snapshot=false
 
 ifeq ($(BR2_ENABLE_DEBUG),y)
 CHROMIUM_OPTS += is_debug=true
@@ -167,18 +164,22 @@ define CHROMIUM_CONFIGURE_CMDS
 		CXX="$(HOSTCXX)" \
 		$(HOST_DIR)/bin/python2 tools/gn/bootstrap/bootstrap.py -s --no-clean; \
 		HOST_AR="$(HOSTAR)" \
-		HOST_NM="$(HOSTNM)" \
 		HOST_CC="$(HOSTCC)" \
-		HOST_CXX="$(HOSTCXX)" \
 		HOST_CFLAGS="$(HOST_CFLAGS)" \
+		HOST_CXX="$(HOSTCXX)" \
 		HOST_CXXFLAGS="$(HOST_CXXFLAGS)" \
+		HOST_NM="$(HOSTNM)" \
 		TARGET_AR="ar" \
-		TARGET_NM="nm" \
 		TARGET_CC="$(CHROMIUM_CC_WRAPPER) clang" \
-		TARGET_CXX="$(CHROMIUM_CC_WRAPPER) clang++" \
 		TARGET_CFLAGS="$(CHROMIUM_TARGET_CFLAGS)" \
+		TARGET_CXX="$(CHROMIUM_CC_WRAPPER) clang++" \
 		TARGET_CXXFLAGS="$(CHROMIUM_TARGET_CXXFLAGS)" \
 		TARGET_LDFLAGS="$(CHROMIUM_TARGET_LDFLAGS)" \
+		TARGET_NM="nm" \
+		V8_AR="$(HOSTAR)" \
+		V8_CC="$(CHROMIUM_CC_WRAPPER) clang" \
+		V8_CXX="$(CHROMIUM_CC_WRAPPER) clang++" \
+		V8_NM="$(HOSTNM)" \
 		out/Release/gn gen out/Release --args="$(CHROMIUM_OPTS)" \
 			--script-executable=$(HOST_DIR)/bin/python2 \
 	)
