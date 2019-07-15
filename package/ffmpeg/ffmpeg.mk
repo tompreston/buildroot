@@ -533,6 +533,14 @@ endif
 FFMPEG_CONF_ENV += CFLAGS="$(FFMPEG_CFLAGS)"
 FFMPEG_CONF_OPTS += $(call qstrip,$(BR2_PACKAGE_FFMPEG_EXTRACONF))
 
+define HOST_FFMPEG_CONFIGURE_CMDS
+	(cd $(HOST_FFMPEG_SRCDIR) && rm -rf config.cache && \
+	$(FFMPEG_CONF_ENV) \
+	./configure \
+		--sysroot=$(HOST_DIR) \
+	)
+endef
+
 # Override FFMPEG_CONFIGURE_CMDS: FFmpeg does not support --target and others
 define FFMPEG_CONFIGURE_CMDS
 	(cd $(FFMPEG_SRCDIR) && rm -rf config.cache && \
@@ -559,3 +567,4 @@ endef
 FFMPEG_POST_INSTALL_TARGET_HOOKS += FFMPEG_REMOVE_EXAMPLE_SRC_FILES
 
 $(eval $(autotools-package))
+$(eval $(host-autotools-package))

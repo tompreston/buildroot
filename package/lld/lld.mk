@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LLD_VERSION = 6.0.0
+LLD_VERSION = 8.0.0
 LLD_SITE = https://llvm.org/releases/$(LLD_VERSION)
 LLD_SOURCE = lld-$(LLD_VERSION).src.tar.xz
 LLD_LICENSE = NCSA

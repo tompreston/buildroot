@@ -30,6 +30,9 @@ COMPILER_RT_CONF_OPTS=-DCOMPILER_RT_STANDALONE_BUILD=OFF \
 define COMPILER_RT_SETUP_RUNTIME_LIBS
 	mkdir -p $(HOST_DIR)/lib/clang/$(HOST_CLANG_VERSION)/lib
 	ln -sf ../../../../$(GNU_TARGET_NAME)/sysroot/usr/lib/linux $(HOST_DIR)/lib/clang/$(HOST_CLANG_VERSION)/lib/linux
+
+	mkdir -p $(HOST_DIR)/lib/clang/$(COMPILER_RT_VERSION)/share/
+	ln -sf ../../../../$(GNU_TARGET_NAME)/sysroot/usr/share/cfi_blacklist.txt $(HOST_DIR)/lib/clang/$(COMPILER_RT_VERSION)/share/cfi_blacklist.txt
 endef
 COMPILER_RT_POST_INSTALL_STAGING_HOOKS += COMPILER_RT_SETUP_RUNTIME_LIBS
 

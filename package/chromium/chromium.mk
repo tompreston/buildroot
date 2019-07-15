@@ -4,41 +4,43 @@
 #
 ################################################################################
 
-CHROMIUM_VERSION = 68.0.3440.106
+CHROMIUM_VERSION = 75.0.3770.100
 CHROMIUM_SITE = https://commondatastorage.googleapis.com/chromium-browser-official
 CHROMIUM_SOURCE = chromium-$(CHROMIUM_VERSION).tar.xz
 CHROMIUM_LICENSE = BSD-Style
 CHROMIUM_LICENSE_FILES = LICENSE
-CHROMIUM_DEPENDENCIES = alsa-lib cairo ffmpeg flac fontconfig freetype \
-			harfbuzz host-clang host-ninja host-nodejs host-python \
-			icu jpeg libdrm libglib2 libkrb5 libnss libpng \
-			libxml2 libxslt minizip opus pango snappy webp \
-			xlib_libXcomposite xlib_libXScrnSaver xlib_libXcursor \
-			xlib_libXrandr zlib
+CHROMIUM_DEPENDENCIES = atk at-spi2-core at-spi2-atk alsa-lib cairo ffmpeg \
+			flac fontconfig freetype harfbuzz host-clang host-ninja host-nodejs \
+			host-pkgconf host-python icu jpeg libdrm libglib2 libkrb5 libnss libpng libxml2 libxslt \
+			minizip opus ncurses pango snappy webp xlib_libXcomposite xlib_libXScrnSaver \
+			xlib_libXcursor xlib_libXrandr zlib compiler-rt
 
 CHROMIUM_TOOLCHAIN_CONFIG_PATH = $(shell pwd)/package/chromium/toolchain
 
 CHROMIUM_OPTS = \
-	host_toolchain=\"$(CHROMIUM_TOOLCHAIN_CONFIG_PATH):host\" \
-	custom_toolchain=\"$(CHROMIUM_TOOLCHAIN_CONFIG_PATH):target\" \
-	v8_snapshot_toolchain=\"$(CHROMIUM_TOOLCHAIN_CONFIG_PATH):v8_snapshot\" \
+	custom_toolchain=\"//build/toolchain/linux/unbundle:default\" \
+	host_toolchain=\"//build/toolchain/linux/unbundle:host\" \
+	v8_snapshot_toolchain=\"//build/toolchain/linux/unbundle:host\" \
 	is_clang=true \
 	clang_use_chrome_plugins=false \
 	treat_warnings_as_errors=false \
 	use_gnome_keyring=false \
 	linux_use_bundled_binutils=false \
 	use_sysroot=false \
-	target_sysroot=\"$(STAGING_DIR)\" \
 	target_cpu=\"$(BR2_PACKAGE_CHROMIUM_TARGET_ARCH)\" \
 	enable_nacl=false \
 	enable_swiftshader=false \
 	enable_linux_installer=false \
-	use_system_zlib=true \
+	is_official_build=true \
+	use_custom_libcxx=false \
+	clang_use_default_sample_profile=false \
+	is_cfi=false
+	pkg_config=\"PKG_CONFIG_PATH="$(STAGING_DIR)/usr/lib/pkgconfig:$(STAGING_DIR)/usr/share/pkgconfig" $(HOST_DIR)/usr/bin/pkgconf\" \
 	use_system_libjpeg=true \
 	use_system_libpng=true \
 	use_system_harfbuzz=true \
-	use_system_freetype=true \
-	use_custom_libcxx=false
+	use_system_freetype=true
+	#use_system_icu=true
 
 CHROMIUM_SYSTEM_LIBS = \
 	ffmpeg \
@@ -46,15 +48,20 @@ CHROMIUM_SYSTEM_LIBS = \
 	fontconfig \
 	freetype \
 	harfbuzz-ng \
-	icu \
 	libdrm \
 	libjpeg \
+	libpng \
+	libvpx \
 	libwebp \
 	libxml \
 	libxslt \
+	openh264 \
 	opus \
+	re2 \
 	snappy \
+	yasm \
 	zlib
+	#icu
 
 ifeq ($(BR2_i386)$(BR2_x86_64),y)
 CHROMIUM_SYSTEM_LIBS += yasm
@@ -64,8 +71,22 @@ endif
 # tcmalloc has portability issues
 CHROMIUM_OPTS += use_allocator=\"none\"
 
+ifneq (BR2_PACKAGE_GTK2,y)
+CHROMIUM_DEPENDENCIES += libgtk3
+else
+CHROMIUM_DEPENDENCIES += libgtk2
+CHROMIUM_OPTS += gtk_version=2
+endif
+
+# V8 snapshots require compiling V8 with the same word size as the target
+# architecture, which means the host needs to have that toolchain available.
+#
+# Additionally, v8_context_snapshot_generator requires host-ffmpeg, which
+# doesn't currently build.
+CHROMIUM_OPTS += v8_use_snapshot=false
+
 ifeq ($(BR2_CCACHE),y)
-CHROMIUM_CC_WRAPPER = ccache
+CHROMIUM_OPTS += cc_wrapper=\"ccache\"
 endif
 
 # LLD is unsupported on i386, and fails during linking
@@ -82,6 +103,7 @@ ifeq ($(BR2_ENABLE_DEBUG),y)
 CHROMIUM_OPTS += is_debug=true
 else
 CHROMIUM_OPTS += is_debug=false
+CHROMIUM_OPTS += blink_symbol_level=0
 endif
 
 ifeq ($(BR2_PACKAGE_CUPS),y)
@@ -109,22 +131,18 @@ else
 CHROMIUM_OPTS += use_pulseaudio=false
 endif
 
-ifeq ($(BR2_PACKAGE_LIBGTK3_X11),y)
-CHROMIUM_DEPENDENCIES += libgtk3
-CHROMIUM_OPTS += use_gtk3=true
-else
-CHROMIUM_DEPENDENCIES += libgtk2 xlib_libXi xlib_libXtst
-CHROMIUM_OPTS += use_gtk3=false
-endif
+#ifeq ($(BR2_TOOLCHAIN_EXTERNAL),y)
+#CHROMIUM_TARGET_LDFLAGS += --gcc-toolchain=$(TOOLCHAIN_EXTERNAL_INSTALL_DIR)
+#else
+#CHROMIUM_TARGET_LDFLAGS += --gcc-toolchain=$(HOST_DIR)
+#endif
 
-ifeq ($(BR2_TOOLCHAIN_EXTERNAL),y)
-CHROMIUM_TARGET_LDFLAGS += --gcc-toolchain=$(TOOLCHAIN_EXTERNAL_INSTALL_DIR)
-else
-CHROMIUM_TARGET_LDFLAGS += --gcc-toolchain=$(HOST_DIR)
-endif
+# This is required for compatibility with host-icu, which is configured
+# with --disable-renaming
+#CHROMIUM_HOST_CXXFLAGS += -DU_DISABLE_RENAMING=1
 
-CHROMIUM_TARGET_CFLAGS += $(CHROMIUM_TARGET_LDFLAGS)
-CHROMIUM_TARGET_CXXFLAGS += $(CHROMIUM_TARGET_CFLAGS)
+#CHROMIUM_TARGET_CFLAGS += $(CHROMIUM_TARGET_LDFLAGS)
+#CHROMIUM_TARGET_CXXFLAGS += $(CHROMIUM_TARGET_CFLAGS)
 
 define CHROMIUM_CONFIGURE_CMDS
 	# Allow building against system libraries in official builds
@@ -141,17 +159,6 @@ define CHROMIUM_CONFIGURE_CMDS
 	ln -sf $(HOST_DIR)/usr/bin/python2 $(@D)/bin/python
 
 	( cd $(@D); \
-		for _lib in $(CHROMIUM_SYSTEM_LIBS); do \
-			find "third_party/$$_lib" -type f \
-			  \! -path "third_party/$$_lib/chromium/*" \
-			  \! -path "third_party/$$_lib/google/*" \
-			  \! -path "third_party/yasm/run_yasm.py" \
-			  \! -regex '.*\.\(gn\|gni\|isolate\)' \
-			  -delete; \
-		done \
-	)
-
-	( cd $(@D); \
 		$(TARGET_MAKE_ENV) \
 		build/linux/unbundle/replace_gn_files.py \
 			--system-libraries $(CHROMIUM_SYSTEM_LIBS) \
@@ -159,28 +166,21 @@ define CHROMIUM_CONFIGURE_CMDS
 
 	( cd $(@D); \
 		$(TARGET_MAKE_ENV) \
-		AR="$(HOSTAR)" \
-		CC="$(HOSTCC)" \
-		CXX="$(HOSTCXX)" \
-		$(HOST_DIR)/bin/python2 tools/gn/bootstrap/bootstrap.py -s --no-clean; \
-		HOST_AR="$(HOSTAR)" \
-		HOST_CC="$(HOSTCC)" \
-		HOST_CFLAGS="$(HOST_CFLAGS)" \
-		HOST_CXX="$(HOSTCXX)" \
-		HOST_CXXFLAGS="$(HOST_CXXFLAGS)" \
-		HOST_NM="$(HOSTNM)" \
-		TARGET_AR="ar" \
-		TARGET_CC="$(CHROMIUM_CC_WRAPPER) clang" \
-		TARGET_CFLAGS="$(CHROMIUM_TARGET_CFLAGS)" \
-		TARGET_CXX="$(CHROMIUM_CC_WRAPPER) clang++" \
-		TARGET_CXXFLAGS="$(CHROMIUM_TARGET_CXXFLAGS)" \
-		TARGET_LDFLAGS="$(CHROMIUM_TARGET_LDFLAGS)" \
-		TARGET_NM="nm" \
-		V8_AR="$(HOSTAR)" \
-		V8_CC="$(CHROMIUM_CC_WRAPPER) clang" \
-		V8_CXX="$(CHROMIUM_CC_WRAPPER) clang++" \
-		V8_NM="$(HOSTNM)" \
-		out/Release/gn gen out/Release --args="$(CHROMIUM_OPTS)" \
+		BUILD_CC="clang" \
+		BUILD_CXX="clang++" \
+		BUILD_AR="$(HOSTAR)" \
+		BUILD_NM="$(HOSTNM)" \
+		BUILD_CFLAGS="$(HOST_CFLAGS)" \
+		BUILD_CXXFLAGS="$(HOST_CXXFLAGS)" \
+		BUILD_LDFLAGS="$(HOST_LDFLAGS)" \
+		CC="clang" \
+		CXX="clang++" \
+		AR="ar" \
+		NM="nm" \
+		CFLAGS="$(TARGET_CFLAGS)" \
+		CXXFLAGS="$(TARGET_CXXFLAGS)" \
+		LDFLAGS="$(TARGET_LDFLAGS)" \
+		gn gen out/Release --args="$(CHROMIUM_OPTS)" \
 			--script-executable=$(HOST_DIR)/bin/python2 \
 	)
 endef
