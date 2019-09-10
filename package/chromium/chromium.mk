@@ -180,7 +180,7 @@ define CHROMIUM_CONFIGURE_CMDS
 		CFLAGS="$(TARGET_CFLAGS)" \
 		CXXFLAGS="$(TARGET_CXXFLAGS)" \
 		LDFLAGS="$(TARGET_LDFLAGS)" \
-		gn gen out/Release --args="$(CHROMIUM_OPTS)" \
+		buildtools/linux64/gn gen out/Release --args="$(CHROMIUM_OPTS)" \
 			--script-executable=$(HOST_DIR)/bin/python2 \
 	)
 endef
