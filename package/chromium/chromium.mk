@@ -42,6 +42,45 @@ CHROMIUM_OPTS = \
 	use_system_freetype=true
 	#use_system_icu=true
 
+# Disable some options for initial building
+CHROMIUM_OPTS += \
+	use_jumbo_build=true \
+	enable_ac3_eac3_audio_demuxing=false \
+	enable_cbcs_encryption_scheme=false \
+	enable_dolby_vision_demuxing=false \
+	enable_ffmpeg_video_decoders=false \
+	enable_hevc_demuxing=false \
+	enable_logging_override=false \
+	enable_media_remoting=false \
+	enable_media_remoting_rpc=false \
+	enable_mojo_media=false \
+	enable_mpeg_h_audio_demuxing=false \
+	enable_runtime_media_renderer_selection=false \
+	enable_test_mojo_media_client=false \
+	is_cast_using_cma_backend=false \
+	link_pulseaudio=false \
+	media_use_ffmpeg=false \
+	media_use_libvpx=false \
+	use_alsa=false \
+	use_cras=false \
+	use_cups=false \
+	use_gnome_keyring=false \
+	use_webaudio_ffmpeg=false \
+	enable_basic_print_dialog=false \
+	enable_print_preview=false \
+	audio_processing_in_audio_service_supported=false \
+	enable_vr=false \
+	is_unsafe_developer_build=false \
+	use_viz_devtools=false
+
+# WIP Codethink some more options to disable
+# TODO I think `closure_compile=false` causes a warning, test this
+CHROMIUM_OPTS += \
+	enable_mojo_renderer=false \
+	closure_compile=false \
+	enable_mojom_closure_compile=false \
+	enable_external_mojo_services=false
+
 CHROMIUM_SYSTEM_LIBS = \
 	ffmpeg \
 	flac \
