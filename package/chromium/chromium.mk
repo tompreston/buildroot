@@ -11,7 +11,7 @@ CHROMIUM_LICENSE = BSD-Style
 CHROMIUM_LICENSE_FILES = LICENSE
 CHROMIUM_DEPENDENCIES = atk at-spi2-core at-spi2-atk alsa-lib cairo ffmpeg \
 			flac fontconfig freetype harfbuzz host-clang host-ninja host-nodejs \
-			host-pkgconf host-python icu jpeg libdrm libglib2 libkrb5 libnss libpng libxml2 libxslt \
+			host-pkgconf host-python icu jpeg libdrm libglib2 libkrb5 host-libnss libnss libpng libxml2 libxslt \
 			minizip opus ncurses pango snappy webp xlib_libXcomposite xlib_libXScrnSaver \
 			xlib_libXcursor xlib_libXrandr zlib compiler-rt
 
