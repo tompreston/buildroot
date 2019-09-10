@@ -1,0 +1,13 @@
+Index: chromium-75.0.3770.100/crypto/nss_util.cc
+===================================================================
+--- chromium-75.0.3770.100.orig/crypto/nss_util.cc
++++ chromium-75.0.3770.100/crypto/nss_util.cc
+@@ -4,7 +4,7 @@
+ 
+ #include "crypto/nss_util.h"
+ 
+-#include <nss.h>
++#include <nss/nss.h>
+ #include <pk11pub.h>
+ #include <plarena.h>
+ #include <prerror.h>
